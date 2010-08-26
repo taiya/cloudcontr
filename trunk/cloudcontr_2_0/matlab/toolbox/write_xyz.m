@@ -1,4 +1,4 @@
-function write_xyz(filename, vertex, normal)
+function write_xyz1(filename, vertex, normal)
 %   Copyright 2010 JJCAO
 
 if size(vertex,2)~=3
