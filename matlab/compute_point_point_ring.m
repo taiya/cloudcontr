@@ -1,6 +1,6 @@
 function ring = compute_point_point_ring(pts, k, index)
-% ·µ»ØµÄringÊÇËùÓĞµãµÄÒ»»·ÃæµÄ¸÷¸ö¶¥µãµÄË÷Òı
-% ¸ÃË÷ÒıÊÇ°´Ë³Ğò´æ´¢µÄ
+% è¿”å›çš„ringæ˜¯æ‰€æœ‰ç‚¹çš„ä¸€ç¯é¢çš„å„ä¸ªé¡¶ç‚¹çš„ç´¢å¼•
+% è¯¥ç´¢å¼•æ˜¯æŒ‰é¡ºåºå­˜å‚¨çš„
 % pts: n*3 matrix for coordinates where we want compute 1-ring.
 % k: k of kNN
 % index: index of kNN
@@ -36,7 +36,7 @@ ring = cell(npts,1);
 % subversion and Matlab 2010a in 64-bit, index(i,1)=i.
 % of 
 if nargin < 3 || isempty(index)
-    kdtree = kdtree_build(pts);% kdtree,ÓÃÀ´ÕÒk½üÁÚ
+    kdtree = kdtree_build(pts);% kdtree,ç”¨æ¥æ‰¾kè¿‘é‚»
     index = zeros(npts, k);
     for i = 1:npts
         index(i,:)  = kdtree_k_nearest_neighbors(kdtree,pts(i,:),k)';
@@ -49,14 +49,14 @@ for i = 1:npts
 %     idx = index(i,:);
 %     nidx = idx(knn_dist(i,:)<radis(i));
 %     if length(nidx) < MIN_NEIGHBOR_NUM
-%          neighbor = pts(index(i,1:MIN_NEIGHBOR_NUM),:); % k½üÁÚ
+%          neighbor = pts(index(i,1:MIN_NEIGHBOR_NUM),:); % kè¿‘é‚»
 %     else
 %     end
-    neighbor = pts(index(i,:),:); % k½üÁÚ  
-    coefs = princomp(neighbor);    
+    neighbor = pts(index(i,:),:); % kè¿‘é‚»  
+    coefs = pca(neighbor, 'Economy', false); 
     x = [neighbor * coefs(:, 1), neighbor * coefs(:, 2)];
     
-    % ÕÒÁÚÓòÊÇ°üº¬Ë÷ÒıÎª1µÄ¶¥µãµÄÒ»»·ÁÚÓò
+    % æ‰¾é‚»åŸŸæ˜¯åŒ…å«ç´¢å¼•ä¸º1çš„é¡¶ç‚¹çš„ä¸€ç¯é‚»åŸŸ
     TRI = delaunayn(x);
     if SHOW_PROGRESS
         figure(1); 
@@ -82,19 +82,19 @@ for i = 1:npts
     temp = sort(temp,2);
     temp = temp(:,2:end);
     
-    % ÕÒÒ»»·µÄµÚÒ»¸ö¶¥µã£ºÈç¹ûÓĞ³öÏÖÒ»´ÎµÄ¶¥µã£¬ÊÓÎªÆğµã£¬·ñÔòÈÎÈ¡Ò»¸ö
+    % æ‰¾ä¸€ç¯çš„ç¬¬ä¸€ä¸ªé¡¶ç‚¹ï¼šå¦‚æœæœ‰å‡ºç°ä¸€æ¬¡çš„é¡¶ç‚¹ï¼Œè§†ä¸ºèµ·ç‚¹ï¼Œå¦åˆ™ä»»å–ä¸€ä¸ª
     x=temp(:);
     x=sort(x);
     d=diff([x;max(x)+1]);
-    count = diff(find([1;d])); % Ã¿¸öÊı×Ö³öÏÖµÄ´ÎÊı
+    count = diff(find([1;d])); % æ¯ä¸ªæ•°å­—å‡ºç°çš„æ¬¡æ•°
     y =[x(find(d)) count];
     n_sorted_index = size(y,1);
     start = find(count==1);
-    if ~isempty(start) % Èç¹ûÓĞÖ»³öÏÖÒ»´ÎµÄ¶¥µã
+    if ~isempty(start) % å¦‚æœæœ‰åªå‡ºç°ä¸€æ¬¡çš„é¡¶ç‚¹
         want_to_find = y(start(1),1);
     else
         want_to_find = temp(1,1);
-        n_sorted_index = n_sorted_index+1; % Ê×Î»ÊÇ·â±ÕµÄ»·
+        n_sorted_index = n_sorted_index+1; % é¦–ä½æ˜¯å°é—­çš„ç¯
     end
     
     j = 0;    
@@ -116,7 +116,7 @@ for i = 1:npts
     
     neighbor_index = index(i,sorted_index);
     
-    % Ê×Î»Îª¶Ëµã£¬Èç¹ûÁÚÓòÃæÊÇ·â±ÕµÄ£¬ÔòÊ×Î»Êı×ÖÏàÍ¬£¬·ñÔò²»Í¬
+    % é¦–ä½ä¸ºç«¯ç‚¹ï¼Œå¦‚æœé‚»åŸŸé¢æ˜¯å°é—­çš„ï¼Œåˆ™é¦–ä½æ•°å­—ç›¸åŒï¼Œå¦åˆ™ä¸åŒ
     ring{i} = neighbor_index;
 end
 
